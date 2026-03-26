@@ -9,7 +9,23 @@ from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
-EMOJIS = [":regional_indicator_g:", ":regional_indicator_a:", ":regional_indicator_y:", ":regional_indicator_p:", ":regional_indicator_o:", ":regional_indicator_r:", ":regional_indicator_n:", ":black_circle:", ":orange_circle:", ":eggplant:", ":briefs:", ":sweat_drops:", ":orangutan:", ":monkey:", ":gorilla:"]
+EMOJIS = [
+    "🇬",   # regional_indicator_g
+    "🇦",   # regional_indicator_a
+    "🇾",   # regional_indicator_y
+    "🇵",   # regional_indicator_p
+    "🇴",   # regional_indicator_o
+    "🇷",   # regional_indicator_r
+    "🇳",   # regional_indicator_n
+    "⚫",   # black_circle
+    "🟠",   # orange_circle
+    "🍆",   # eggplant
+    "🩲",   # briefs
+    "💦",   # sweat_drops
+    "🦧",   # orangutan
+    "🐒",   # monkey
+    "🦍",   # gorilla
+]
 
 DELAI_ENTRE_REACTIONS = 0.5
 
