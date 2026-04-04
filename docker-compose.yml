@@ -5,3 +5,4 @@ services:
     restart: always
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - PYTHONUNBUFFERED=1
