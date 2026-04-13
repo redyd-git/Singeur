@@ -149,10 +149,10 @@ async def singe(interaction: discord.Interaction, membre: discord.Member):
     """Réagit au dernier message du membre ciblé avec une série d'emojis prédéfinis."""
     print(f"[CMD] /singe reçu par {interaction.user} → cible : {membre}", flush=True)
 
-    # On ne peut pas se singifier soi-même (optionnel, décommenter si souhaité)
-    # if membre == interaction.user:
-    #     await interaction.response.send_message("⚠️ Tu ne peux pas te singifier toi-même !", ephemeral=True)
-    #     return
+    # On ne peut pas se singifier soi-même
+    if membre == interaction.user:
+        await interaction.response.send_message("⚠️ Tu ne peux pas te singifier toi-même !", ephemeral=True)
+        return
 
     # On refuse de singifier un bot
     if membre.bot:
