@@ -4,7 +4,7 @@ from discord import app_commands
 import asyncio
 import os
 import json
-from datetime import date
+from datetime import date, timedelta
 from dotenv import load_dotenv
 
 # ── Configuration ──────────────────────────────────────────────────────────────
@@ -48,14 +48,19 @@ def save_streaks(data: dict) -> None:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-def increment_streak(user_id: int) -> dict:
+def increment_streak(user_id: int):
     """
-    Incrémente le compteur d'utilisations pour user_id.
-    Retourne les infos de streak : total, streak_actuel, record.
+    Incrémente le compteur d'utilisations pour user_id (style Duolingo).
+    - Meme jour      : rien ne change pour le streak (deja compte)
+    - Jour suivant   : streak + 1
+    - Plus d'un jour : streak casse, repart a 1
+    Retourne (entry, already_done_today).
     """
     streaks = load_streaks()
     key = str(user_id)
-    today = str(date.today())
+    today = date.today()
+    today_str = str(today)
+    yesterday_str = str(today - timedelta(days=1))
 
     entry = streaks.get(key, {
         "total": 0,
@@ -64,47 +69,53 @@ def increment_streak(user_id: int) -> dict:
         "record": 0,
     })
 
-    # Mise à jour du streak journalier
     last = entry.get("last_date")
-    if last == today:
-        # Déjà singifié aujourd'hui → on incrémente quand même le streak
-        entry["streak"] += 1
-    else:
-        # Nouveau jour → streak repart à 1
-        entry["streak"] = 1
-    entry["last_date"] = today
+    already_today = (last == today_str)
 
-    entry["total"] += 1
+    if not already_today:
+        entry["total"] += 1
+        if last == yesterday_str:
+            entry["streak"] += 1
+        else:
+            entry["streak"] = 1
+        entry["last_date"] = today_str
 
-    # Mise à jour du record
-    if entry["streak"] > entry.get("record", 0):
-        entry["record"] = entry["streak"]
+        if entry["streak"] > entry.get("record", 0):
+            entry["record"] = entry["streak"]
 
-    streaks[key] = entry
-    save_streaks(streaks)
-    return entry
+        streaks[key] = entry
+        save_streaks(streaks)
+
+    return entry, already_today
 
 
-def streak_message(entry: dict, display_name: str) -> str:
+def streak_message(entry: dict, display_name: str, already_today: bool) -> str:
     """Génère le message de streak à afficher publiquement."""
-    total   = entry["total"]
-    streak  = entry["streak"]
-    record  = entry["record"]
+    total  = entry["total"]
+    streak = entry["streak"]
+    record = entry["record"]
 
-    # Emoji selon le palier de streak
-    if streak >= 50:
+    if already_today:
+        return (
+            f"🐒 **{display_name}** a deja singifie aujourd'hui ! "
+            f"| Streak : **{streak}** jour{'s' if streak > 1 else ''} | Total : **{total}**"
+        )
+
+    if streak >= 30:
         flame = "🔥🔥🔥"
-    elif streak >= 20:
+    elif streak >= 10:
         flame = "🔥🔥"
-    elif streak >= 5:
+    elif streak >= 3:
         flame = "🔥"
     else:
         flame = "🐒"
 
-    record_str = f" *(nouveau record !)*" if streak == record and streak > 1 else f" *(record : {record})*" if record > 1 else ""
+    nouveau_record = streak == record and streak > 1
+    record_str = " *(nouveau record !)* 🏆" if nouveau_record else f" *(record : {record} jours)*" if record > 1 else ""
+
     return (
-        f"{flame} **{display_name}** a singifié ! "
-        f"| Streak : **{streak}**{record_str} "
+        f"{flame} Streak de **{display_name}** : **{streak}** jour{'s' if streak > 1 else ''} "
+        f"consecutif{'s' if streak > 1 else ''}{record_str} "
         f"| Total : **{total}** singification{'s' if total > 1 else ''}"
     )
 
@@ -176,12 +187,12 @@ async def singe(interaction: discord.Interaction, membre: discord.Member):
                 print(f"Erreur HTTP lors de l'ajout de réaction : {e}")
 
         # ── Streak ────────────────────────────────────────────────────────────
-        entry = increment_streak(interaction.user.id)
+        entry, already_today = increment_streak(interaction.user.id)
 
         # ── Message public ────────────────────────────────────────────────────
         annonce = (
             f"🐒 **{interaction.user.display_name}** a singifié **{membre.display_name}** !\n"
-            f"{streak_message(entry, interaction.user.display_name)}"
+            f"{streak_message(entry, interaction.user.display_name, already_today)}"
         )
         await interaction.channel.send(annonce)
 
