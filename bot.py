@@ -34,10 +34,10 @@ STREAKS_FILE = "streaks.json"
 
 # ── Commandes images ───────────────────────────────────────────────────────────
 COMMANDES_IMAGES = {
-    "mattini-stringini":  "images/mattini_stringini.png",
-    "grrr-mange-moi": "images/matteo_sexy.jpg",
+    "mattini_stringini":  "images/mattini_stringini.png",
+    "grrr_mange_moi": "images/matteo_sexy.jpg",
     "soeur": "images/Soeur.png",
-    "retourne-toi": "images/theo.png"
+    "retourne_toi": "images/theo.png"
 }
 
 # ── Streak helpers ─────────────────────────────────────────────────────────────
