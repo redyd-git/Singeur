@@ -63,7 +63,8 @@ def increment_streak(user_id: int):
     yesterday_str = str(today - timedelta(days=1))
 
     entry = streaks.get(key, {
-        "total": 0,
+        "uses": 0,   # nombre total d'utilisations (toutes)
+        "total": 0,  # nombre de jours distincts ou singifie (pour le streak)
         "streak": 0,
         "last_date": None,
         "record": 0,
@@ -71,6 +72,9 @@ def increment_streak(user_id: int):
 
     last = entry.get("last_date")
     already_today = (last == today_str)
+
+    # uses s'incremente a chaque utilisation sans exception
+    entry["uses"] = entry.get("uses", entry.get("total", 0)) + 1
 
     if not already_today:
         entry["total"] += 1
@@ -83,8 +87,8 @@ def increment_streak(user_id: int):
         if entry["streak"] > entry.get("record", 0):
             entry["record"] = entry["streak"]
 
-        streaks[key] = entry
-        save_streaks(streaks)
+    streaks[key] = entry
+    save_streaks(streaks)
 
     return entry, already_today
 
@@ -95,10 +99,12 @@ def streak_message(entry: dict, display_name: str, already_today: bool) -> str:
     streak = entry["streak"]
     record = entry["record"]
 
+    uses = entry.get("uses", total)
+
     if already_today:
         return (
             f"🐒 **{display_name}** a deja singifie aujourd'hui ! "
-            f"| Streak : **{streak}** jour{'s' if streak > 1 else ''} | Total : **{total}**"
+            f"| Streak : **{streak}** jour{'s' if streak > 1 else ''} | Total : **{uses}** utilisation{'s' if uses > 1 else ''}"
         )
 
     if streak >= 30:
@@ -116,7 +122,7 @@ def streak_message(entry: dict, display_name: str, already_today: bool) -> str:
     return (
         f"{flame} Streak de **{display_name}** : **{streak}** jour{'s' if streak > 1 else ''} "
         f"consecutif{'s' if streak > 1 else ''}{record_str} "
-        f"| Total : **{total}** singification{'s' if total > 1 else ''}"
+        f"| Total : **{uses}** utilisation{'s' if uses > 1 else ''}"
     )
 
 
@@ -226,11 +232,12 @@ async def singe_stats(interaction: discord.Interaction, membre: discord.Member =
         )
         return
 
+    uses = entry.get("uses", entry.get("total", 0))
     await interaction.response.send_message(
         f"📊 Stats de **{cible.display_name}** :\n"
-        f"• Total : **{entry['total']}** singification{'s' if entry['total'] > 1 else ''}\n"
-        f"• Streak actuel : **{entry['streak']}**\n"
-        f"• Record de streak : **{entry['record']}**",
+        f"• Total utilisations : **{uses}**\n"
+        f"• Streak actuel : **{entry['streak']}** jour{'s' if entry['streak'] > 1 else ''}\n"
+        f"• Record de streak : **{entry['record']}** jour{'s' if entry['record'] > 1 else ''}",
         ephemeral=False,
     )
 
