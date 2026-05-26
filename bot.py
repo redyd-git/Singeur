@@ -1,3 +1,5 @@
+import random
+
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -27,6 +29,16 @@ EMOJIS = [
     "🦧",   # orangutan
     "🐒",   # monkey
     "🦍",   # gorilla
+]
+
+GIFS = [
+    "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmoza3NpbjNpbmUzeWR6YjR2Zm51enhyMDNwcWt6eTZya3VxOXhwZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dwcFlb2ovRF3amTpCi/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21xc3ZmazJzYXE1bTc3aTRqam5lZGppcmhmMjh6NTI5ZzhqdHNnaSZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/MKUOUJrFldIyi2hJyT/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGJ6NHFybjY0YWUxYTRrbHlwMnphdXI4amhmOWU2dnRhdzAzZm03ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/srQZgMVIdWolmZwdLt/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGJ6NHFybjY0YWUxYTRrbHlwMnphdXI4amhmOWU2dnRhdzAzZm03ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/QmsFIUxH4YImGPHNyR/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGJ6NHFybjY0YWUxYTRrbHlwMnphdXI4amhmOWU2dnRhdzAzZm03ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Nz6crPlIi8StUV2bNr/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bWQ5ZGVqZ250MmlpMGJmdXoxc3MyZnRmaHNudWU4dHp2eWloN3U5NCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/AINeC40MaJRtVw4hZ3/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cTc4aDg4Y3cyY2JnYnhwMmZyMHR5aGxzaGlrNDRkbm9sZnJ1NDllbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ieP69qXmRIr2GTOUqc/giphy.gif",
 ]
 
 DELAI_ENTRE_REACTIONS = 0.5
@@ -141,7 +153,6 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-
 @bot.event
 async def on_ready():
     print(f"✅ Connecté en tant que {bot.user} (ID: {bot.user.id})")
@@ -151,6 +162,10 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Erreur lors de la synchronisation : {e}")
 
+
+@bot.tree.command(name="67", description="SIXXX SEVENNN")
+async def _67(interaction: discord.Interaction):
+    await interaction.response.send_message(random.choice(GIFS))
 
 @bot.tree.command(name="singe", description="Singifie le dernier message d'un membre 🐒")
 @app_commands.describe(membre="Le membre dont le dernier message sera singifié")
